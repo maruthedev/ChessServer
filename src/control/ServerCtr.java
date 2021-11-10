@@ -23,8 +23,6 @@ public class ServerCtr {
     private ArrayList<ServerProcessing> myProcess;
     private IPAddress myAddress = new IPAddress("localhost", 8888);  //default server host and port
 
-    private String string = "test";
-
     public ServerCtr(ServerMainFrm view) {
         myProcess = new ArrayList<ServerProcessing>();
         this.view = view;
