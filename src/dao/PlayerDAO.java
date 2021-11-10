@@ -66,23 +66,23 @@ public class PlayerDAO extends DAO {
     }
 
 
-    public boolean createAccount(Player p) {
-        boolean success = false;
+    public Player signUp(Player p) {
         try {
-            String un = p.getUsername();
-            String pw = p.getPassword();
-            ArrayList<Player> re = (ArrayList<Player>) session.createQuery("from Player where username = un").list();
+            Query query = session.createQuery("FROM Player WHERE username = :u");
+            query.setParameter("u",p.getUsername());
+            ArrayList<Player> re = new ArrayList<>(query.list());
             if (re.size() == 0) {
-                p.setStatus("Online");
-                p.setWins(0);
-                p.setLoses(0);
-                session.createQuery("insert into Player(un,pw,'Online','0','0')" +
-                        "select username, password, status, wins, loses from Player").executeUpdate();
-                success = true;
+                Player player = new Player(p.getUsername(),p.getPassword(),"online",0,0);
+                Transaction trans = session.getTransaction();
+                if (!trans.isActive()) trans.begin();
+                session.save(player);
+                trans.commit();
+
+                return player;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return success;
+        return null;
     }
 }

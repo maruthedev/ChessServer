@@ -155,13 +155,21 @@ public class ServerCtr {
 
                         switch (data.getPerformative()) {
                             case ObjectWrapper.LOGIN_USER:
-                                player = (Player) data.getData();
-                                Player pr = (Player) pd.checkLogin(player);
-                                if (pr != null) {
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_LOGIN_USER, pr));
+                                player = (Player) pd.checkLogin((Player) data.getData());
+                                if (player != null) {
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_LOGIN_USER, player));
                                     OnlinePlayer();
                                 } else {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_LOGIN_USER, "no"));
+                                }
+                                break;
+                            case ObjectWrapper.SIGNUP_USER:
+                                player = (Player) pd.signUp((Player) data.getData());
+                                if(player != null){
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_SIGNUP_USER, player));
+                                    OnlinePlayer();
+                                }else {
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_SIGNUP_USER, "no"));
                                 }
                                 break;
                             case ObjectWrapper.ONLINE_PLAYER:
@@ -208,8 +216,6 @@ public class ServerCtr {
 
                         }
                     }
-                    //ois.reset();
-                    //oos.reset();
                 }
             } catch (EOFException | SocketException e) {
                 //e.printStackTrace();
