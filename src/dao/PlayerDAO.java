@@ -85,4 +85,15 @@ public class PlayerDAO extends DAO {
         }
         return null;
     }
+
+    public ArrayList<Player> globalRank(){
+        ArrayList<Player> re = null;
+        try {
+            Query query = session.createQuery("FROM Player");
+            re = new ArrayList<Player>(query.list());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return re;
+    }
 }

@@ -213,7 +213,10 @@ public class ServerCtr {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND,"no"));
                                 }
                                 break;
-
+                            case ObjectWrapper.RANK:
+                                players = pd.globalRank();
+                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_RANK,players));
+                                break;
                         }
                     }
                 }
