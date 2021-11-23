@@ -29,9 +29,6 @@
         <mapping class="model.Match"/>
         <mapping class="model.ParticipateATournament"/>
         <mapping class="model.Player"/>
-        <mapping class="model.PlayerRanking"/>
-        <mapping class="model.RankingTable"/>
         <mapping class="model.Tournament"/>
-        <mapping class="model.TournamentRanking"/>
     </session-factory>
 </hibernate-configuration>
