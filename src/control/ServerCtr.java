@@ -217,6 +217,13 @@ public class ServerCtr {
                                 players = pd.globalRank();
                                 oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_RANK,players));
                                 break;
+                            case ObjectWrapper.DELETE_FRIEND:
+                                players = (ArrayList<Player>) data.getData();
+                                condition = bfd.deleteFriend(players);
+                                if(condition){
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND,"ok"));
+                                }else oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND,"no"));
+                                break;
                         }
                     }
                 }

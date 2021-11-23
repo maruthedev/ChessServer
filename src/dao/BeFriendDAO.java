@@ -99,4 +99,38 @@ public class BeFriendDAO extends DAO {
         }
         return success;
     }
+
+    public boolean deleteFriend(ArrayList<Player> players){
+        boolean success = false;
+        try {
+            int i = players.get(0).getId();
+            int i1 = players.get(1).getId();
+
+            Query query = session.createQuery("FROM BeFriend " +
+                    "WHERE player.id = :i AND player1.id = :i1");
+            Query query1 = session.createQuery("FROM BeFriend " +
+                    "WHERE player.id = :i1 AND player1.id = :i");
+            query.setParameter("i",i);
+            query.setParameter("i1",i1);
+
+            query1.setParameter("i",i);
+            query1.setParameter("i1",i1);
+
+            ArrayList<BeFriend> re = new ArrayList<>(query.list());
+            re.addAll(query1.list());
+            BeFriend bf = re.get(0);
+            Transaction trans = session.getTransaction();
+            if(!trans.isActive()) trans.begin();
+
+            session.delete(bf);
+            trans.commit();
+            success  = true;
+            System.out.println("delete");
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return success;
+    }
 }
