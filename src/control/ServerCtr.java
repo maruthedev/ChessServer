@@ -1,6 +1,7 @@
 package control;
 
 import dao.BeFriendDAO;
+import dao.MatchDAO;
 import dao.PlayerDAO;
 import model.IPAddress;
 import model.ObjectWrapper;
@@ -89,6 +90,13 @@ public class ServerCtr {
         }
     }
 
+    public void move(String mm){
+        ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REP_O_MOVE,mm);
+        for(ServerProcessing sp : myProcess){
+            sp.sendData(data);
+        }
+    }
+
 
     /**
      * The class to listen the connections from client, avoiding the blocking of accept connection
@@ -109,7 +117,6 @@ public class ServerCtr {
                     myProcess.add(sp);
                     view.showMessage("Number of client connecting to the server: " + myProcess.size());
                     publicClientNumber();
-                    //OnlinePlayer();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -149,6 +156,7 @@ public class ServerCtr {
                         ObjectWrapper data = (ObjectWrapper) o;
                         PlayerDAO pd = new PlayerDAO();
                         BeFriendDAO bfd = new BeFriendDAO();
+                        MatchDAO md = new MatchDAO();
                         ArrayList<Player> players;
                         Player player;
                         boolean condition;
@@ -185,8 +193,8 @@ public class ServerCtr {
                                 players = (ArrayList<Player>) data.getData();
                                 Player p1 = players.get(0);
                                 Player p2 = players.get(1);
-                                boolean con = bfd.addFriend(p1,p2);
-                                if(p1.getId() != p2.getId() && con == true){
+                                condition = bfd.addFriend(p1,p2);
+                                if(p1.getId() != p2.getId() && condition == true){
                                     System.out.println("success");
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND,"ok"));
                                     FriendReq(p2);
@@ -223,6 +231,15 @@ public class ServerCtr {
                                 if(condition){
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND,"ok"));
                                 }else oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND,"no"));
+                                break;
+                            case ObjectWrapper.MOVE:
+                                condition = md.u_move((ArrayList<Object>) data.getData());
+                                if(condition == true){
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE,"ok"));
+                                    String mm = (String) (((ArrayList<Object>) data.getData()).get(1));
+                                    System.out.println(mm);
+                                    move(mm);
+                                }else oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE,"no"));
                                 break;
                         }
                     }
