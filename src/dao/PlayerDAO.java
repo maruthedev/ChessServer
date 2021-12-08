@@ -37,7 +37,7 @@ public class PlayerDAO extends DAO {
         try {
             Query query = session.createQuery("FROM Player WHERE status = :onl OR status =:inm");
             query.setParameter("onl", "online");
-            query.setParameter("inm","in match");
+            query.setParameter("inm", "in match");
             re = new ArrayList<Player>(query.list());
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,10 +69,10 @@ public class PlayerDAO extends DAO {
     public Player signUp(Player p) {
         try {
             Query query = session.createQuery("FROM Player WHERE username = :u");
-            query.setParameter("u",p.getUsername());
+            query.setParameter("u", p.getUsername());
             ArrayList<Player> re = new ArrayList<>(query.list());
             if (re.size() == 0) {
-                Player player = new Player(p.getUsername(),p.getPassword(),"online",0,0);
+                Player player = new Player(p.getUsername(), p.getPassword(), "online", 0, 0);
                 Transaction trans = session.getTransaction();
                 if (!trans.isActive()) trans.begin();
                 session.save(player);
@@ -86,12 +86,12 @@ public class PlayerDAO extends DAO {
         return null;
     }
 
-    public ArrayList<Player> globalRank(){
+    public ArrayList<Player> globalRank() {
         ArrayList<Player> re = null;
         try {
             Query query = session.createQuery("FROM Player");
             re = new ArrayList<Player>(query.list());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return re;

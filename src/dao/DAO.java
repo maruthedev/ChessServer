@@ -12,14 +12,14 @@ public class DAO {
     public static Session session;
 //    public static Connection con;
 
-    public DAO(){
-        if(session == null){
+    public DAO() {
+        if (session == null) {
             try {
                 session = new Configuration().configure(new File("resources/Hibernate.config.xml"))
                         .buildSessionFactory().openSession();
-            }catch (HibernateException ex) {
+            } catch (HibernateException ex) {
                 ex.printStackTrace();
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

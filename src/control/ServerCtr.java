@@ -45,11 +45,9 @@ public class ServerCtr {
             myListening.start();
             myAddress.setHost(InetAddress.getLocalHost().getHostAddress());
             view.showServerInfor(myAddress);
-            //System.out.println("server started!");
             view.showMessage("TCP server is running at the port " + myAddress.getPort() + "...");
         } catch (Exception e) {
             e.printStackTrace();
-            ;
         }
     }
 
@@ -81,7 +79,7 @@ public class ServerCtr {
         }
     }
 
-    public void FriendReq(Player player){
+    public void FriendReq(Player player) {
         BeFriendDAO bfd = new BeFriendDAO();
         ArrayList<Player> req = new ArrayList<>(bfd.friendList(player));
         ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_REQUEST, req);
@@ -90,9 +88,18 @@ public class ServerCtr {
         }
     }
 
-    public void move(String mm){
-        ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REP_O_MOVE,mm);
-        for(ServerProcessing sp : myProcess){
+    public void friendUpdate(Player player){
+        BeFriendDAO bfd = new BeFriendDAO();
+        ArrayList<Player> fl = new ArrayList<>(bfd.friendList(player));
+        ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_REQUEST, fl);
+        for (ServerProcessing sp : myProcess) {
+            sp.sendData(data);
+        }
+    }
+
+    public void move(String mm) {
+        ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REP_O_MOVE, mm);
+        for (ServerProcessing sp : myProcess) {
             sp.sendData(data);
         }
     }
@@ -129,8 +136,6 @@ public class ServerCtr {
      */
     class ServerProcessing extends Thread {
         private Socket mySocket;
-        //private ObjectInputStream ois;
-        //private ObjectOutputStream oos;
 
         public ServerProcessing(Socket s) {
             super();
@@ -173,10 +178,10 @@ public class ServerCtr {
                                 break;
                             case ObjectWrapper.SIGNUP_USER:
                                 player = (Player) pd.signUp((Player) data.getData());
-                                if(player != null){
+                                if (player != null) {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_SIGNUP_USER, player));
                                     OnlinePlayer();
-                                }else {
+                                } else {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_SIGNUP_USER, "no"));
                                 }
                                 break;
@@ -185,61 +190,65 @@ public class ServerCtr {
                                 oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ONLINE_PLAYER, players));
                                 break;
                             case ObjectWrapper.LOGOUT_USER:
-                                pd.logout((Player)data.getData());
-                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_LOGOUT_USER,"ok"));
+                                pd.logout((Player) data.getData());
+                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_LOGOUT_USER, "ok"));
                                 OnlinePlayer();
                                 break;
                             case ObjectWrapper.ADD_FRIEND:
                                 players = (ArrayList<Player>) data.getData();
                                 Player p1 = players.get(0);
                                 Player p2 = players.get(1);
-                                condition = bfd.addFriend(p1,p2);
-                                if(p1.getId() != p2.getId() && condition == true){
+                                condition = bfd.addFriend(p1, p2);
+                                if (p1.getId() != p2.getId() && condition == true) {
                                     System.out.println("success");
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND,"ok"));
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND, "ok"));
                                     FriendReq(p2);
-                                }else{
+                                } else {
                                     System.out.println("fail");
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND,"no"));
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND, "no"));
                                 }
                                 break;
                             case ObjectWrapper.FRIEND_LIST:
-                                player = (Player)data.getData();
+                                player = (Player) data.getData();
                                 ArrayList<Player> re = new ArrayList<>(bfd.friendList(player));
-                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_LIST,re));
+                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_LIST, re));
                                 break;
                             case ObjectWrapper.FRIEND_REQUEST:
-                                players = new ArrayList<>(bfd.requestList((Player)data.getData()));
-                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_REQUEST,players));
+                                players = new ArrayList<>(bfd.requestList((Player) data.getData()));
+                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_REQUEST, players));
                                 break;
                             case ObjectWrapper.ACCEPT_FRIEND:
                                 players = (ArrayList<Player>) data.getData();
                                 condition = bfd.acceptFriend(players);
-                                if(condition == true){
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND,"ok"));
-                                }else{
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND,"no"));
+                                if (condition == true) {
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND, "ok"));
+                                } else {
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND, "no"));
                                 }
+                                friendUpdate(players.get(0));
+                                friendUpdate(players.get(1));
                                 break;
                             case ObjectWrapper.RANK:
                                 players = pd.globalRank();
-                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_RANK,players));
+                                oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_RANK, players));
                                 break;
                             case ObjectWrapper.DELETE_FRIEND:
                                 players = (ArrayList<Player>) data.getData();
                                 condition = bfd.deleteFriend(players);
-                                if(condition){
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND,"ok"));
-                                }else oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND,"no"));
+                                if (condition) {
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND, "ok"));
+                                } else oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND, "no"));
+                                friendUpdate(players.get(0));
+                                friendUpdate(players.get(1));
                                 break;
                             case ObjectWrapper.MOVE:
                                 condition = md.u_move((ArrayList<Object>) data.getData());
-                                if(condition == true){
-                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE,"ok"));
+                                if (condition == true) {
+                                    oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE, "ok"));
                                     String mm = (String) (((ArrayList<Object>) data.getData()).get(1));
                                     System.out.println(mm);
                                     move(mm);
-                                }else oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE,"no"));
+                                } else oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE, "no"));
                                 break;
                         }
                     }

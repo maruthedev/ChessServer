@@ -8,13 +8,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ServerMainFrm extends JFrame implements ActionListener{
+public class ServerMainFrm extends JFrame implements ActionListener {
     private JTextField txtServerHost, txtServerPort;
     private JButton btnStartServer, btnStopServer;
     private JTextArea mainText;
     private ServerCtr myServer;
 
-    public ServerMainFrm(){
+    public ServerMainFrm() {
         super("TCP server view");
 
         JPanel mainPanel = new JPanel();
@@ -33,7 +33,7 @@ public class ServerMainFrm extends JFrame implements ActionListener{
         txtServerHost.setBounds(new Rectangle(170, 70, 150, 25));
         txtServerHost.setText("localhost");
         txtServerHost.setEditable(false);
-        mainPanel.add(txtServerHost,null);
+        mainPanel.add(txtServerHost, null);
 
         JLabel lblPort = new JLabel("Server port:");
         lblPort.setBounds(new Rectangle(10, 100, 150, 25));
@@ -41,18 +41,18 @@ public class ServerMainFrm extends JFrame implements ActionListener{
 
         txtServerPort = new JTextField(50);
         txtServerPort.setBounds(new Rectangle(170, 100, 150, 25));
-        mainPanel.add(txtServerPort,null);
+        mainPanel.add(txtServerPort, null);
 
         btnStartServer = new JButton("Start server");
         btnStartServer.setBounds(new Rectangle(10, 150, 150, 25));
         btnStartServer.addActionListener(this);
-        mainPanel.add(btnStartServer,null);
+        mainPanel.add(btnStartServer, null);
 
         btnStopServer = new JButton("Stop server");
         btnStopServer.setBounds(new Rectangle(170, 150, 150, 25));
         btnStopServer.addActionListener(this);
         btnStopServer.setEnabled(false);
-        mainPanel.add(btnStopServer,null);
+        mainPanel.add(btnStopServer, null);
 
         JScrollPane jScrollPane1 = new JScrollPane();
         mainText = new JTextArea("");
@@ -69,27 +69,27 @@ public class ServerMainFrm extends JFrame implements ActionListener{
 
     public void showServerInfor(IPAddress addr) {
         txtServerHost.setText(addr.getHost());
-        txtServerPort.setText(addr.getPort()+"");
+        txtServerPort.setText(addr.getPort() + "");
     }
 
     @Override
     public void actionPerformed(ActionEvent ae) {
         // TODO Auto-generated method stub
-        if(ae.getSource() instanceof JButton) {
-            JButton clicked = (JButton)ae.getSource();
-            if(clicked.equals(btnStartServer)) {// start button
-                if(!txtServerPort.getText().isEmpty() && (txtServerPort.getText().trim().length() > 0)) {//custom port
+        if (ae.getSource() instanceof JButton) {
+            JButton clicked = (JButton) ae.getSource();
+            if (clicked.equals(btnStartServer)) {// start button
+                if (!txtServerPort.getText().isEmpty() && (txtServerPort.getText().trim().length() > 0)) {//custom port
                     int port = Integer.parseInt(txtServerPort.getText().trim());
                     myServer = new ServerCtr(this, port);
                     // new ServerCtr(this, port);
-                }else {// default port
+                } else {// default port
                     myServer = new ServerCtr(this);
                     //new ServerCtr(this);
                 }
                 btnStopServer.setEnabled(true);
                 btnStartServer.setEnabled(false);
-            }else if(clicked.equals(btnStopServer)) {// stop button
-                if(myServer != null) {
+            } else if (clicked.equals(btnStopServer)) {// stop button
+                if (myServer != null) {
                     myServer.stopServer();
                     myServer = null;
                 }
@@ -100,8 +100,8 @@ public class ServerMainFrm extends JFrame implements ActionListener{
         }
     }
 
-    public void showMessage(String s){
-        mainText.append("\n"+s);
+    public void showMessage(String s) {
+        mainText.append("\n" + s);
         mainText.setCaretPosition(mainText.getDocument().getLength());
     }
 

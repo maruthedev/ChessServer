@@ -20,7 +20,7 @@ public class BeFriendDAO extends DAO {
             Query query1 = session.createQuery("FROM Player WHERE id " +
                     "IN(SELECT player FROM BeFriend WHERE player1.id = :i AND status = 'friend')");
             query.setParameter("i", p.getId());
-            query1.setParameter("i",p.getId());
+            query1.setParameter("i", p.getId());
             playerList = new ArrayList<>(query.list());
             playerList.addAll(query1.list());
         } catch (Exception e) {
@@ -47,15 +47,15 @@ public class BeFriendDAO extends DAO {
         try {
             int i = player.getId();
             int i1 = other.getId();
-            if(i != i1){
+            if (i != i1) {
                 Query query = session.createQuery("From BeFriend WHERE player.id = :i AND player1.id = :i1");
-                query.setParameter("i",i);
-                query.setParameter("i1",i1);
+                query.setParameter("i", i);
+                query.setParameter("i1", i1);
                 ArrayList<Player> re = new ArrayList<>(query.list());
-                if(re.size() == 0){
-                    BeFriend bf = new BeFriend(0,"request",player, other);
+                if (re.size() == 0) {
+                    BeFriend bf = new BeFriend(0, "request", player, other);
                     Transaction trans = session.getTransaction();
-                    if(!trans.isActive()) trans.begin();
+                    if (!trans.isActive()) trans.begin();
                     session.save(bf);
                     trans.commit();
                     success = true;
@@ -68,39 +68,38 @@ public class BeFriendDAO extends DAO {
         return success;
     }
 
-    public boolean acceptFriend(ArrayList<Player> players){
+    public boolean acceptFriend(ArrayList<Player> players) {
         boolean success = false;
         try {
             Player player = players.get(0);
             Player other = players.get(1);
             Query query = session.createQuery("FROM BeFriend " +
                     "WHERE player.id = :i AND player1.id = :i1");
-            query.setParameter("i",player.getId());
-            query.setParameter("i1",other.getId());
+            query.setParameter("i", player.getId());
+            query.setParameter("i1", other.getId());
             ArrayList<BeFriend> re = new ArrayList<>(query.list());
             BeFriend bf = re.get(0);
             Transaction trans = session.getTransaction();
-            if(!trans.isActive()) trans.begin();
+            if (!trans.isActive()) trans.begin();
 
-            if(players.size() == 2){
+            if (players.size() == 2) {
                 bf.setStatus("friend");
                 session.update(bf);
                 trans.commit();
-                success  = true;
+                success = true;
                 System.out.println("add");
-            }else{
+            } else {
                 session.delete(bf);
                 trans.commit();
                 System.out.printf("ref");
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return success;
     }
 
-    public boolean deleteFriend(ArrayList<Player> players){
+    public boolean deleteFriend(ArrayList<Player> players) {
         boolean success = false;
         try {
             int i = players.get(0).getId();
@@ -110,25 +109,24 @@ public class BeFriendDAO extends DAO {
                     "WHERE player.id = :i AND player1.id = :i1");
             Query query1 = session.createQuery("FROM BeFriend " +
                     "WHERE player.id = :i1 AND player1.id = :i");
-            query.setParameter("i",i);
-            query.setParameter("i1",i1);
+            query.setParameter("i", i);
+            query.setParameter("i1", i1);
 
-            query1.setParameter("i",i);
-            query1.setParameter("i1",i1);
+            query1.setParameter("i", i);
+            query1.setParameter("i1", i1);
 
             ArrayList<BeFriend> re = new ArrayList<>(query.list());
             re.addAll(query1.list());
             BeFriend bf = re.get(0);
             Transaction trans = session.getTransaction();
-            if(!trans.isActive()) trans.begin();
+            if (!trans.isActive()) trans.begin();
 
             session.delete(bf);
             trans.commit();
-            success  = true;
+            success = true;
             System.out.println("delete");
 
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return success;
