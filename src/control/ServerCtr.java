@@ -3,6 +3,7 @@ package control;
 import dao.BeFriendDAO;
 import dao.MatchDAO;
 import dao.PlayerDAO;
+import model.BeFriend;
 import model.IPAddress;
 import model.ObjectWrapper;
 import model.Player;
@@ -164,6 +165,7 @@ public class ServerCtr {
                         MatchDAO md = new MatchDAO();
                         ArrayList<Player> players;
                         Player player;
+                        BeFriend bf;
                         boolean condition;
 
                         switch (data.getPerformative()) {
@@ -195,14 +197,12 @@ public class ServerCtr {
                                 OnlinePlayer();
                                 break;
                             case ObjectWrapper.ADD_FRIEND:
-                                players = (ArrayList<Player>) data.getData();
-                                Player p1 = players.get(0);
-                                Player p2 = players.get(1);
-                                condition = bfd.addFriend(p1, p2);
-                                if (p1.getId() != p2.getId() && condition == true) {
+                                bf = (BeFriend) data.getData();
+                                condition = bfd.addFriend(bf);
+                                if (condition == true) {
                                     System.out.println("success");
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND, "ok"));
-                                    FriendReq(p2);
+                                    FriendReq(bf.getPlayer1());
                                 } else {
                                     System.out.println("fail");
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ADD_FRIEND, "no"));
@@ -218,28 +218,29 @@ public class ServerCtr {
                                 oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_FRIEND_REQUEST, players));
                                 break;
                             case ObjectWrapper.ACCEPT_FRIEND:
-                                players = (ArrayList<Player>) data.getData();
-                                condition = bfd.acceptFriend(players);
+                                bf = (BeFriend) data.getData();
+                                System.out.println(bf.getStatus());
+                                condition = bfd.acceptFriend(bf);
                                 if (condition == true) {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND, "ok"));
                                 } else {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_ACCEPT_FRIEND, "no"));
                                 }
-                                friendUpdate(players.get(0));
-                                friendUpdate(players.get(1));
+                                friendUpdate(bf.getPlayer());
+                                friendUpdate(bf.getPlayer1());
                                 break;
                             case ObjectWrapper.RANK:
                                 players = pd.globalRank();
                                 oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_RANK, players));
                                 break;
                             case ObjectWrapper.DELETE_FRIEND:
-                                players = (ArrayList<Player>) data.getData();
-                                condition = bfd.deleteFriend(players);
+                                bf = (BeFriend) data.getData();
+                                condition = bfd.deleteFriend(bf);
                                 if (condition) {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND, "ok"));
                                 } else oos.writeObject(new ObjectWrapper(ObjectWrapper.REPLY_DELETE_FRIEND, "no"));
-                                friendUpdate(players.get(0));
-                                friendUpdate(players.get(1));
+                                friendUpdate(bf.getPlayer());
+                                friendUpdate(bf.getPlayer1());
                                 break;
                             case ObjectWrapper.MOVE:
                                 condition = md.u_move((ArrayList<Object>) data.getData());
