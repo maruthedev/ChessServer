@@ -4,8 +4,6 @@ import model.Match;
 import model.Player;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MatchDAO extends DAO {
@@ -13,11 +11,11 @@ public class MatchDAO extends DAO {
         super();
     }
 
-    public boolean u_move(ArrayList<Object> mm) {
+    public boolean u_move(Match match) {
         boolean success = false;
         try {
-            Player player = (Player) mm.get(0);
-            String movement = (String) mm.get(1);
+            Player player = (Player) match.getPlayers().get(0);
+            String movement = (String) match.getMovement();
             Query query = session.createQuery("FROM Match WHERE id " +
                     "IN(SELECT match FROM Player WHERE id = :i)");
             query.setParameter("i", player.getId());

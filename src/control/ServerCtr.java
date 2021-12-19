@@ -3,10 +3,7 @@ package control;
 import dao.BeFriendDAO;
 import dao.MatchDAO;
 import dao.PlayerDAO;
-import model.BeFriend;
-import model.IPAddress;
-import model.ObjectWrapper;
-import model.Player;
+import model.*;
 import view.ServerMainFrm;
 
 import java.io.EOFException;
@@ -98,8 +95,9 @@ public class ServerCtr {
         }
     }
 
-    public void move(String mm) {
-        ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REP_O_MOVE, mm);
+    public void move(Match match) {
+        System.out.printf("sent");
+        ObjectWrapper data = new ObjectWrapper(ObjectWrapper.REP_O_MOVE, match);
         for (ServerProcessing sp : myProcess) {
             sp.sendData(data);
         }
@@ -243,12 +241,11 @@ public class ServerCtr {
                                 friendUpdate(bf.getPlayer1());
                                 break;
                             case ObjectWrapper.MOVE:
-                                condition = md.u_move((ArrayList<Object>) data.getData());
+                                condition = md.u_move((Match) data.getData());
                                 if (condition == true) {
                                     oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE, "ok"));
-                                    String mm = (String) (((ArrayList<Object>) data.getData()).get(1));
-                                    System.out.println(mm);
-                                    move(mm);
+                                    System.out.println(((Match) data.getData()).getMovement());
+                                    move((Match) data.getData());
                                 } else oos.writeObject(new ObjectWrapper(ObjectWrapper.REP_MOVE, "no"));
                                 break;
                         }
